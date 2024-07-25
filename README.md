@@ -15,13 +15,13 @@ const std = @import("std");
 const SM3 = @import("zig-sm3").SM3;
 
 pub fn main() !void {
-    var out: [16]u8 = undefined;
+    var out: [32]u8 = undefined;
     
     h = SM3.init(.{});
     h.update("abc");
     h.final(out[0..]);
     
-    // output: da853b0d3f88d99b30283a69e6ded6bb
+    // output: 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0
     std.debug.print("output: {s}\n", .{out});
 }
 ~~~
