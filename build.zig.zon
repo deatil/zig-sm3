@@ -1,7 +1,7 @@
 .{
     .name = "zig-sm3",
     .description = "A SM3 hash function.",
-    .version = "1.0.0",
+    .version = "1.0.1",
     .paths = .{
         "build.zig",
         "build.zig.zon",

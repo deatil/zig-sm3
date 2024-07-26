@@ -13,8 +13,6 @@ pub const SM3 = struct {
     pub const digest_length = 32;
     pub const Options = struct {};
     
-    const size_bit_size = 5;
-    
     const sbox = [_]u32{
         0x79cc4519, 0xf3988a32, 0xe7311465, 0xce6228cb, 0x9cc45197, 0x3988a32f, 0x7311465e, 0xe6228cbc,
         0xcc451979, 0x988a32f3, 0x311465e7, 0x6228cbce, 0xc451979c, 0x88a32f39, 0x11465e73, 0x228cbce6,
