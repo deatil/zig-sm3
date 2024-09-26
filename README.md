@@ -5,7 +5,33 @@ zig-sm3 is a SM3 hash function for Zig.
 
 ### Env
 
- - Zig >= 0.12
+ - Zig >= 0.13
+
+
+### Adding zig-sm3 as a dependency
+
+Add the dependency to your project:
+
+```sh
+zig fetch --save=zig-sm3 git+https://github.com/deatil/zig-sm3#main
+```
+
+And the following to your `build.zig` file:
+
+```zig
+    const zig_sm3 = b.dependency("zig-sm3", .{
+        .target = target,
+        .optimize = optimize,
+    });
+    exe.root_module.addImport("zig-sm3", zig_sm3.module("zig-sm3"));
+    exe.linkLibrary(zig_sm3.artifact("zig-sm3"));
+```
+
+The `zig-sm3` structure can be imported in your application with:
+
+```zig
+const zig_sm3 = @import("zig-sm3");
+```
 
 
 ### Get Starting
