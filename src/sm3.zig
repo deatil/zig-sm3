@@ -104,6 +104,12 @@ pub const SM3 = struct {
         }
     }
 
+    pub fn finalResult(d: *Self) [digest_length]u8 {
+        var result: [digest_length]u8 = undefined;
+        d.final(&result);
+        return result;
+    }
+
     fn round(d: *Self, b: *const [64]u8) void {
         var a: [8]u32 = undefined;
         var w: [68]u32 = undefined;
@@ -207,6 +213,18 @@ pub const SM3 = struct {
         return ((y ^ z) & x) ^ z;
     }
 
+    pub const Error = error{};
+    pub const Writer = std.io.Writer(*Self, Error, write);
+
+    fn write(self: *Self, bytes: []const u8) Error!usize {
+        self.update(bytes);
+        return bytes.len;
+    }
+
+    pub fn writer(self: *Self) Writer {
+        return .{ .context = self };
+    }
+
 };
 
 // Hash using the specified hasher `H` asserting `expected == H(input)`.
@@ -255,6 +273,24 @@ test "streaming" {
     h.update("c");
     h.final(out[0..]);
 
+    try assertEqual("66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0", out[0..]);
+}
+
+test "finalResult" {
+    var h = SM3.init(.{});
+    var out = h.finalResult();
+    try assertEqual("1ab21d8355cfa17f8e61194831e81a8f22bec8c728fefb747ed035eb5082aa2b", out[0..]);
+
+    h = SM3.init(.{});
+    h.update("abc");
+    out = h.finalResult();
+    try assertEqual("66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0", out[0..]);
+}
+
+test "writer" {
+    var h = SM3.init(.{});
+    try h.writer().print("{s}", .{"abc"});
+    const out = h.finalResult();
     try assertEqual("66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0", out[0..]);
 }
 
