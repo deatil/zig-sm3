@@ -5,7 +5,7 @@ zig-sm3 is a SM3 hash function for Zig.
 
 ### Env
 
- - Zig >= 0.14.0-dev.2851+b074fb7dd
+ - Zig >= 0.14.0-dev.3451+d8d2aa9af
 
 
 ### Adding zig-sm3 as a dependency
