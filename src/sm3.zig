@@ -8,22 +8,22 @@ const fmt = std.fmt;
 /// Namely, it is trivial to find multiple inputs producing the same hash.
 pub const SM3 = struct {
     const Self = @This();
-    
+
     pub const block_length = 64;
     pub const digest_length = 32;
     pub const Options = struct {};
-    
+
     const sbox = [_]u32{
         0x79cc4519, 0xf3988a32, 0xe7311465, 0xce6228cb, 0x9cc45197, 0x3988a32f, 0x7311465e, 0xe6228cbc,
         0xcc451979, 0x988a32f3, 0x311465e7, 0x6228cbce, 0xc451979c, 0x88a32f39, 0x11465e73, 0x228cbce6,
         0x9d8a7a87, 0x3b14f50f, 0x7629ea1e, 0xec53d43c, 0xd8a7a879, 0xb14f50f3, 0x629ea1e7, 0xc53d43ce,
         0x8a7a879d, 0x14f50f3b, 0x29ea1e76, 0x53d43cec, 0xa7a879d8, 0x4f50f3b1, 0x9ea1e762, 0x3d43cec5,
         0x7a879d8a, 0xf50f3b14, 0xea1e7629, 0xd43cec53, 0xa879d8a7, 0x50f3b14f, 0xa1e7629e, 0x43cec53d,
-        0x879d8a7a, 0xf3b14f5, 0x1e7629ea, 0x3cec53d4, 0x79d8a7a8, 0xf3b14f50, 0xe7629ea1, 0xcec53d43,
+        0x879d8a7a, 0xf3b14f5,  0x1e7629ea, 0x3cec53d4, 0x79d8a7a8, 0xf3b14f50, 0xe7629ea1, 0xcec53d43,
         0x9d8a7a87, 0x3b14f50f, 0x7629ea1e, 0xec53d43c, 0xd8a7a879, 0xb14f50f3, 0x629ea1e7, 0xc53d43ce,
         0x8a7a879d, 0x14f50f3b, 0x29ea1e76, 0x53d43cec, 0xa7a879d8, 0x4f50f3b1, 0x9ea1e762, 0x3d43cec5,
     };
-    
+
     s: [8]u32,
     // Streaming Cache
     buf: [64]u8,
@@ -87,18 +87,18 @@ pub const SM3 = struct {
             d.round(d.buf[0..]);
             @memset(d.buf[0..], 0);
         }
-        
+
         const bcount: u64 = d.total_len / block_length;
-        
+
         const len = @as(u32, @intCast(bcount >> 23));
         mem.writeInt(u32, d.buf[56..][0..4], len, .big);
-        
+
         const nx = @as(u64, @intCast(d.buf_len)) << 3;
         const len2 = @as(u32, @intCast((bcount << 9) + nx));
         mem.writeInt(u32, d.buf[60..][0..4], len2, .big);
-        
+
         d.round(d.buf[0..]);
-        
+
         for (d.s, 0..) |s, j| {
             mem.writeInt(u32, out[4 * j ..][0..4], s, .big);
         }
@@ -113,7 +113,7 @@ pub const SM3 = struct {
     fn round(d: *Self, b: *const [64]u8) void {
         var a: [8]u32 = undefined;
         var w: [68]u32 = undefined;
-        
+
         var ss1: u32 = undefined;
         var ss2: u32 = undefined;
         var tt1: u32 = undefined;
@@ -128,7 +128,7 @@ pub const SM3 = struct {
         while (i < 8) : (i += 1) {
             a[i] = d.s[i];
         }
-        
+
         i = 0;
         while (i < 12) : (i += 1) {
             w[i + 4] = mem.readInt(u32, b[(i + 4) * 4 ..][0..4], .big);
@@ -148,7 +148,7 @@ pub const SM3 = struct {
             a[5] = a[4];
             a[4] = p0(tt2);
         }
-        
+
         i = 12;
         while (i < 16) : (i += 1) {
             w[i + 4] = p1(w[i - 12] ^ w[i - 5] ^ rotateLeft32(w[i + 1], 15)) ^ rotateLeft32(w[i - 9], 7) ^ w[i - 2];
@@ -167,7 +167,7 @@ pub const SM3 = struct {
             a[5] = a[4];
             a[4] = p0(tt2);
         }
-        
+
         i = 16;
         while (i < 64) : (i += 1) {
             w[i + 4] = p1(w[i - 12] ^ w[i - 5] ^ rotateLeft32(w[i + 1], 15)) ^ rotateLeft32(w[i - 9], 7) ^ w[i - 2];
@@ -186,7 +186,7 @@ pub const SM3 = struct {
             a[5] = a[4];
             a[4] = p0(tt2);
         }
-        
+
         i = 0;
         while (i < 8) : (i += 1) {
             d.s[i] ^= a[i];
@@ -214,7 +214,7 @@ pub const SM3 = struct {
     }
 
     pub const Error = error{};
-    pub const Writer = std.io.Writer(*Self, Error, write);
+    pub const Writer = std.io.GenericWriter(*Self, Error, write);
 
     fn write(self: *Self, bytes: []const u8) Error!usize {
         self.update(bytes);
@@ -224,7 +224,6 @@ pub const SM3 = struct {
     pub fn writer(self: *Self) Writer {
         return .{ .context = self };
     }
-
 };
 
 // Hash using the specified hasher `H` asserting `expected == H(input)`.

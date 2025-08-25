@@ -1,9 +1,9 @@
 .{
     .name = .zig_sm3,
     .description = "A SM3 hash function.",
-    .version = "1.0.2",
-    .fingerprint = 0x7bc718d5ae5a484f, 
-    .minimum_zig_version = "0.14.0-dev.3451+d8d2aa9af",
+    .version = "1.1.0",
+    .fingerprint = 0x7bc718d5ae5a484f,
+    .minimum_zig_version = "0.15.1",
     .paths = .{
         "build.zig",
         "build.zig.zon",
