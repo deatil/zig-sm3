@@ -7,6 +7,12 @@ const fmt = std.fmt;
 /// The SM3 function is now considered cryptographically broken.
 /// Namely, it is trivial to find multiple inputs producing the same hash.
 pub const SM3 = struct {
+    s: [8]u32,
+    // Streaming Cache
+    buf: [64]u8,
+    buf_len: u8,
+    total_len: u64,
+
     const Self = @This();
 
     pub const block_length = 64;
@@ -23,12 +29,6 @@ pub const SM3 = struct {
         0x9d8a7a87, 0x3b14f50f, 0x7629ea1e, 0xec53d43c, 0xd8a7a879, 0xb14f50f3, 0x629ea1e7, 0xc53d43ce,
         0x8a7a879d, 0x14f50f3b, 0x29ea1e76, 0x53d43cec, 0xa7a879d8, 0x4f50f3b1, 0x9ea1e762, 0x3d43cec5,
     };
-
-    s: [8]u32,
-    // Streaming Cache
-    buf: [64]u8,
-    buf_len: u8,
-    total_len: u64,
 
     pub fn init(options: Options) Self {
         _ = options;
